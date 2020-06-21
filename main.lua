@@ -16,11 +16,13 @@ require("player")
 G = 1500
 AirFriction = 1.1
 
+Player1 = NewPlayer(Xecran/2,Yecran/10,Color.LightRed,'d','q','space')
+
 function love.load()
 end
 
 function love.update(dt)
-    Player.update(dt)
+    Player1.update(dt)
     Platform.update()
     
 end
@@ -28,7 +30,7 @@ end
 function love.draw()
     love.graphics.setBackgroundColor(Color.DarkBlue)
     Platform.draw()
-    Player.draw()
+    Player1.draw()
 end
 
 function love.keypressed(key)
