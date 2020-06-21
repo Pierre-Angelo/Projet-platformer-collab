@@ -17,7 +17,6 @@ function NewPlayer(x,y,color,right,left,jump)
     Player.Grounded        = false
     Player.Color           = color
     Player.CurrentPlatform = nil
-    Player.Bounce          = 5 --diviseur de la vitesse du module
     Player.WalkForce       = 4000 -- force appliquée quant le joueur avance
     Player.JumpForce       = 40000 -- force appliquée quant le joueur saute
     Player.AirControl      = 4   --diviseur de la force horizontale appliquée lorsque le joueur est dans les airs
@@ -42,7 +41,7 @@ function NewPlayer(x,y,color,right,left,jump)
             Player.ApplyForce( -AirFriction * Player.SpeedX ,0) 
         end
     end
-    
+
     
     function Player.Reaction()
         if Player.Grounded then
@@ -50,20 +49,14 @@ function NewPlayer(x,y,color,right,left,jump)
         end
         
     end
-    
-    function Player.SumForces()
-    
-        Player.ApplyForce(0,G) --Gravity
-    
-        Player.Reaction()
-    
+
+    function Player.Movments ()
         if love.keyboard.isDown(Player.Controls.Right)  then --droite
             if Player.Grounded then
                 Player.ApplyForce(Player.WalkForce,0)
             else
                 Player.ApplyForce(Player.WalkForce/Player.AirControl,0)
             end
-    
         end
     
         if love.keyboard.isDown(Player.Controls.Left)  then--gauche
@@ -78,16 +71,24 @@ function NewPlayer(x,y,color,right,left,jump)
             Player.ApplyForce(0,-Player.JumpForce)
             Player.Grounded = false
             Player.CurrentPlatform = nil
-            
         end
+    end
+    
+    function Player.SumForces()
+     
+        Player.ApplyForce(0,G) --Gravity
+    
+        Player.Reaction()
     
         Player.GroundFriction()
     
-        Player.AirFriction()
-            
+        Player.AirFriction() 
+
+        Player.Movments()
+
     end 
-    
-    function Player.update(dt)
+
+    function Player.Physics(dt)
         Player.SumForces()      
     
         Player.AccelerationX = Player.ForceX
@@ -102,6 +103,35 @@ function NewPlayer(x,y,color,right,left,jump)
     
         Player.ForceX = 0
         Player.ForceY = 0
+
+    end
+
+    function Player.GroundCollisions ()
+        if Player.Y + Player.Height/2 >= Ground.Y then
+            Player.Y = Ground.Y - Player.Height/2 
+            Player.Grounded = true
+            Player.CurrentPlatform = Ground
+            Player.SpeedY = 0
+            Player.DashCount = 1
+
+        end
+    end
+
+    function Player.WallsCollision() --gere la collision entre un objet et un mur (Wip)
+        if Player.X - Player.Width/2 <=LimitsLevels.Left then
+            Player.X = LimitsLevels.Left + Player.Width/2 
+        elseif Player.X + Player.Width/2 >= LimitsLevels.Right then
+            Player.X = LimitsLevels.Right - Player.Width/2 
+        end
+    end
+
+    function Player.Collisions ()
+        Player.GroundCollisions()
+        Player.WallsCollision()
+    end
+    function Player.update(dt)
+        Player.Physics(dt)      
+        Player.Collisions()
     end
     
     function Player.draw()
