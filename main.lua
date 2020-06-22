@@ -6,32 +6,40 @@
 --Language        :lua
 --==============================================================================
 io.stdout:setvbuf('no')
+mainFont = love.graphics.newFont(14)
 Xecran,Yecran      =  love.window.getDesktopDimensions()
 love.window.setMode(Xecran,Yecran,{fullscreen})
 
+G = 1500
+AirFriction = 1.1
+
 require("color")
+require("grid")
 require("platform")
 require("player")
 
-G = 1500
-AirFriction = 1.01
 
+Map = NewMap(50,50,50)
 Player1 = NewPlayer(Xecran/2,Yecran/10,Color.LightRed,'d','q','space')
+Ground  = NewPlatform(0,18,40,5,1,5)
+
+Plaforms = {Ground} 
+
 
 function love.load()
 end
 
 function love.update(dt)
-    Platform.update()
+
     Player1.update(dt)
+    Ground.update()
 end
 
 function love.draw()
     love.graphics.setBackgroundColor(Color.DarkBlue)
-    Platform.draw()
+    Ground.draw()
     Player1.draw()
-    love.graphics.setColor(Color.LightGreen)
-    love.graphics.print(" X:"..math.floor(Player1.X).." Y:"..math.floor(Player1.Y).." SX:"..math.floor(Player1.SpeedX).." SY:"..math.floor(Player1.SpeedY).." AX:"..math.floor(Player1.AccelerationX).." AY:"..math.floor(Player1.AccelerationY))
+    Map.draw()
 end
 
 function love.keypressed(key)

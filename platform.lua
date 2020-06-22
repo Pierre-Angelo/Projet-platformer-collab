@@ -1,21 +1,36 @@
-Platform = {}
+function NewPlatform (x,y,width,height,id,frictionValue)
 
-Ground = {}
-    Ground.X = 0
-    Ground.Y =  Yecran*2/3
-    Ground.Width =Xecran
-    Ground.Height = Yecran/3
-    Ground.Friction = 6
-LimitsLevels = {}
-    LimitsLevels.Left = 0
-    LimitsLevels.Right = Xecran
-
+local Platform = {}
+Platform.Xmap      = x
+Platform.Ymap      = y
+Platform.WidthMap  = width
+Platform.HeightMap = height
+Platform.ID        = id
+Platform.Friction  = frictionValue
+  
 
 
+    
 function Platform.update()
+    for i = Platform.Xmap , Platform.Xmap + Platform.WidthMap -1 do
+        for j =Platform.Ymap ,Platform.Ymap +Platform.HeightMap -1 do
+            Map[i][j].Occupied = true
+            Map[i][j].Platform = id
+        end
+    end
+
 end
 
 function Platform.draw()
-    love.graphics.setColor(Color.LightOrange)
-    love.graphics.rectangle("fill",Ground.X,Ground.Y,Ground.Width,Ground.Height)
+    for i = Platform.Xmap , Platform.Xmap + Platform.WidthMap -1 do
+        for j =Platform.Ymap ,Platform.Ymap +Platform.HeightMap -1 do
+            love.graphics.setColor(Color.Brown)
+            love.graphics.rectangle("fill",Map[i][j].X,Map[i][j].Y,Map[i][j].Size,Map[i][j].Size)
+        end
+    end
+ 
+end
+
+return Platform
+
 end

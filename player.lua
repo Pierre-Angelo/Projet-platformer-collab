@@ -3,6 +3,8 @@ function NewPlayer(x,y,color,right,left,jump)
     local Player = {}
     Player.X               = x
     Player.Y               = y
+    Player.Xmap            = math.floor(Player.X/Map[0][0].Size)
+    Player.Ymap            = math.floor(Player.Y/Map[0][0].Size)
     Player.ForceX          = 0
     Player.ForceY          = 0
     Player.SpeedX          = 0
@@ -34,7 +36,7 @@ function NewPlayer(x,y,color,right,left,jump)
         if Player.Grounded  then 
             Player.ApplyForce( -Player.CurrentPlatform.Friction * Player.SpeedX ,0) 
         end
-    end
+    end 
     
     function Player.AirFriction ()-- ralentit le joueur sur le sol 
         if not Player.Grounded  then 
@@ -87,7 +89,7 @@ function NewPlayer(x,y,color,right,left,jump)
         Player.Movments()
 
     end 
-
+ 
     function Player.Physics(dt)
         Player.SumForces()      
     
@@ -100,34 +102,40 @@ function NewPlayer(x,y,color,right,left,jump)
             
         Player.X =Player.X +Player.SpeedX * dt
         Player.Y =Player.Y +Player.SpeedY * dt
+
+        Player.Xmap = math.floor(Player.X/Map[0][0].Size)
+        Player.Ymap = math.floor(Player.Y/Map[0][0].Size)
     
         Player.ForceX = 0
         Player.ForceY = 0
 
     end
 
-    function Player.GroundCollisions ()
-        if Player.Y + Player.Height/2 >= Ground.Y then
-            Player.Y = Ground.Y - Player.Height/2 
-            Player.Grounded = true
-            Player.CurrentPlatform = Ground
-            Player.SpeedY = 0
-            Player.DashCount = 1
-
-        end
-    end
-
-    function Player.WallsCollision() --gere la collision entre un objet et un mur (Wip)
-        if Player.X - Player.Width/2 <=LimitsLevels.Left then
-            Player.X = LimitsLevels.Left + Player.Width/2 
-        elseif Player.X + Player.Width/2 >= LimitsLevels.Right then
-            Player.X = LimitsLevels.Right - Player.Width/2 
-        end
-    end
-
     function Player.Collisions ()
-        Player.GroundCollisions()
-        Player.WallsCollision()
+        for i = Player.Xmap - 1 ,Player.Xmap + 1 do
+            for j = Player.Ymap - 1, Player.Ymap + 1  do
+                if  Map[i][j].Occupied then
+                    if Player.Xmap > i and Player.X-Player.Width/2 <= Map[i][j].X + Map[0][0].Size then
+                        Player.X = Map[i][j].X + Map[0][0].Size + Player.Width/2+1
+                        Player.SpeedX = 0
+                    elseif Player.Xmap < i and Player.X + Player.Width/2 >= Map[i][j].X then
+                        Player.X =  Map[i][j].X - Player.Width/2-1
+                        Player.SpeedX = 0
+                    end
+
+                    if Player.Ymap > j and Player.Y - Player.Height/2 <= Map[i][j].Y + Map[0][0].Size then
+                        Player.Y = Map[i][j].Y + Map[0][0].Size + Player.Height/2+1
+                        Player.SpeedY = 0
+                    elseif Player.Ymap < j and Player.Y + Player.Height/2 >= Map[i][j].Y then
+                        Player.Y =  Map[i][j].Y - Player.Height/2-1
+                        Player.Grounded = true
+                        Player.CurrentPlatform = Plaforms[Map[i][j].Platform]
+                        Player.SpeedY = 0
+                    end
+
+                end
+            end
+        end
     end
     function Player.update(dt)
         Player.Physics(dt)      
@@ -141,5 +149,5 @@ function NewPlayer(x,y,color,right,left,jump)
     end
     return Player
     
-    end
+end
     
