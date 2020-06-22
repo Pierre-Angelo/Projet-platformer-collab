@@ -12,17 +12,18 @@ function CreateCase(size,i,j)
     end
   
     function Case.draw(debug)
-        debug = debug or false
-        if debug then
+     debug = debug or false
+        if debug then 
             love.graphics.setColor(Case.Color)
             love.graphics.rectangle("line",Case.X,Case.Y,Case.Size,Case.Size)
-            love.graphics.print(Case.Name,Case.X + Case.Size/2,Case.Y + Case.Size/2,0,1,1,mainFont:getWidth(Case.Name)/2,mainFont:getHeight(Case.Name)/2)                
+
+            --[[ love.graphics.print(Case.Name,Case.X + Case.Size/2,Case.Y + Case.Size/2,0,1,1,mainFont:getWidth(Case.Name)/2,mainFont:getHeight(Case.Name)/2)                
 
             if Case.Occupied then 
                 love.graphics.print(1, Case.X+Case.Size-10, Case.Y)
             else 
                 love.graphics.print(0, Case.X+Case.Size-10, Case.Y)
-            end
+            end  ]]
         end
     end
     return Case

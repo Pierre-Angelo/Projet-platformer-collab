@@ -20,7 +20,7 @@ function NewPlayer(x,y,color,right,left,jump)
     Player.Color           = color
     Player.CurrentPlatform = nil
     Player.WalkForce       = 4000 -- force appliquée quant le joueur avance
-    Player.JumpForce       = 40000 -- force appliquée quant le joueur saute
+    Player.JumpForce       = 60000 -- force appliquée quant le joueur saute
     Player.AirControl      = 4   --diviseur de la force horizontale appliquée lorsque le joueur est dans les airs
     Player.Controls        = {}
         Player.Controls.Right = right
@@ -113,30 +113,35 @@ function NewPlayer(x,y,color,right,left,jump)
 
     function Player.Collisions ()
         for i = Player.Xmap - 1 ,Player.Xmap + 1 do
-            for j = Player.Ymap - 1, Player.Ymap + 1  do
-                if  Map[i][j].Occupied then
-                    if Player.Xmap > i and Player.X-Player.Width/2 <= Map[i][j].X + Map[0][0].Size then
-                        Player.X = Map[i][j].X + Map[0][0].Size + Player.Width/2+1
-                        Player.SpeedX = 0
-                    elseif Player.Xmap < i and Player.X + Player.Width/2 >= Map[i][j].X then
-                        Player.X =  Map[i][j].X - Player.Width/2-1
-                        Player.SpeedX = 0
-                    end
+            for j = Player.Ymap - 1, Player.Ymap + 1   do
+                if  i == Player.Xmap or j == Player.Ymap then
+                    if  Map[i][j].Occupied then
+                        if Player.Xmap > i and Player.X-Player.Width/2 < Map[i][j].X + Map[0][0].Size then
+                            Player.X = Map[i][j].X + Map[0][0].Size + Player.Width/2
+                            Player.SpeedX = 0
+                        elseif Player.Xmap < i and Player.X + Player.Width/2 > Map[i][j].X then
+                            Player.X =  Map[i][j].X - Player.Width/2
+                            Player.SpeedX = 0
+                        end
 
-                    if Player.Ymap > j and Player.Y - Player.Height/2 <= Map[i][j].Y + Map[0][0].Size then
-                        Player.Y = Map[i][j].Y + Map[0][0].Size + Player.Height/2+1
-                        Player.SpeedY = 0
-                    elseif Player.Ymap < j and Player.Y + Player.Height/2 >= Map[i][j].Y then
-                        Player.Y =  Map[i][j].Y - Player.Height/2-1
-                        Player.Grounded = true
-                        Player.CurrentPlatform = Plaforms[Map[i][j].Platform]
-                        Player.SpeedY = 0
+                        if Player.Ymap > j and Player.Y - Player.Height/2 < Map[i][j].Y + Map[0][0].Size then
+                            Player.Y = Map[i][j].Y + Map[0][0].Size + Player.Height/2
+                            Player.SpeedY = 0
+                        elseif Player.Ymap < j and Player.Y + Player.Height/2 > Map[i][j].Y then
+                            Player.Y =  Map[i][j].Y - Player.Height/2
+                            Player.Grounded = true
+                            Player.CurrentPlatform = Plaforms[Map[i][j].Platform]
+                            Player.SpeedY = 0
+                        end
+                    elseif j > Player.Ymap then
+                        Player.Grounded = false
                     end
 
                 end
             end
         end
     end
+
     function Player.update(dt)
         Player.Physics(dt)      
         Player.Collisions()
