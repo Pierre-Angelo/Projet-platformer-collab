@@ -40,10 +40,10 @@ local Grid ={}
         end
     end
 
-function Grid.draw()
+function Grid.draw(debug)
     for i = 0, caseCountWidth do
         for j = 0,caseCountHeight do
-            Grid [i][j].draw()
+            Grid [i][j].draw(debug)
         end
     end
 end

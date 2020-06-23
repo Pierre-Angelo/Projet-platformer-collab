@@ -20,7 +20,7 @@ function NewPlayer(x,y,color,right,left,jump)
     Player.Color           = color
     Player.CurrentPlatform = nil
     Player.WalkForce       = 4000 -- force appliquée quant le joueur avance
-    Player.JumpForce       = 60000 -- force appliquée quant le joueur saute
+    Player.JumpForce       = 50000 -- force appliquée quant le joueur saute
     Player.AirControl      = 4   --diviseur de la force horizontale appliquée lorsque le joueur est dans les airs
     Player.Controls        = {}
         Player.Controls.Right = right
