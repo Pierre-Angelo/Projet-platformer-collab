@@ -55,7 +55,7 @@ function love.draw()
     Player1.draw()
     Map.draw()
     love.graphics.setColor(Color.Red)
-    love.graphics.print(math.floor(Player1.CurrentFrame))
+    love.graphics.print(Player1.CurrentAnimation.Name)
 end
 
 function love.keypressed(key)

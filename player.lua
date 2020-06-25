@@ -15,42 +15,104 @@ function NewPlayer(x,y,color,right,left,jump)
     Player.JumpForce       = 50000 -- force appliquée quant le joueur saute
     Player.AirControl      = 4   --diviseur de la force horizontale appliquée lorsque le joueur est dans les airs
     Player.Width           = 50 
-    Player.Height          = 50 
+    Player.Height          = 50
     Player.Angle           = 0
     Player.Grounded        = false
-    Player.Animations      = {}
-        Player.Animations.Idle = {}
-            Player.Animations.Idle.Sheet            = love.graphics.newImage("resources/assets/Idle_Animation.png")
-            Player.Animations.Idle.TotalFrames      = 2
-            Player.Animations.Idle.NumberSideFrames = 1
-            Player.Animations.Idle.Width            = Player.Animations.Idle.Sheet:getWidth() / Player.Animations.Idle.NumberSideFrames
-            Player.Animations.Idle.Height           = Player.Animations.Idle.Sheet:getHeight() / 2
-            Player.Animations.Idle.FPS              =3
-        Player.Animations.Run = {}
-            Player.Animations.Run.Sheet            = love.graphics.newImage("resources/assets/Run_Animation.png")
-            Player.Animations.Run.TotalFrames      = 7
-            Player.Animations.Run.NumberSideFrames = 3
-            Player.Animations.Run.Width            = Player.Animations.Run.Sheet:getWidth() / Player.Animations.Run.NumberSideFrames
-            Player.Animations.Run.Height           = Player.Animations.Run.Sheet:getHeight() / Player.Animations.Run.NumberSideFrames
-        Player.Animations.Jump = {}
-            Player.Animations.Jump.Sheet            = love.graphics.newImage("resources/assets/Jump_Animation.png")
-            Player.Animations.Jump.TotalFrames      = 23
-            Player.Animations.Jump.NumberSideFrames = 5
-            Player.Animations.Jump.Width            = Player.Animations.Jump.Sheet:getWidth() / Player.Animations.Jump.NumberSideFrames
-            Player.Animations.Jump.Height           = Player.Animations.Jump.Sheet:getHeight() / Player.Animations.Jump.NumberSideFrames
-    Player.CurrentAnimation = Player.Animations.Idle
-    Player.ScaleX          = 1/(Player.CurrentAnimation.Width/Player.Width)
-    Player.ScaleY          = 1/(Player.CurrentAnimation.Height/Player.Height)
-    Player.CurrentFrame    = 0
-    Player.XsideFrameCount = 0
-    Player.YsideFrameCount = 0
-    Player.Time            = 1
+    Player.Time            = 0
     Player.Color           = color
     Player.CurrentPlatform = nil
     Player.Controls        = {}
         Player.Controls.Right = right
         Player.Controls.Left  = left
         Player.Controls.Jump  = jump
+
+--########################################################################################################################################
+--                                            Display and Animation
+--########################################################################################################################################
+    
+    function Player.NewAnimation(imgsrc, nbFrames, nbSideFrames,fps,name)
+        local Animation = {}
+            Animation.Sheet            = love.graphics.newImage(imgsrc)
+            Animation.Name             = name
+            Animation.TotalFrames      = nbFrames
+            Animation.NumberSideFrames = nbSideFrames
+            Animation.FPS              = fps
+            Animation.Width            = Animation.Sheet:getWidth() / Animation.NumberSideFrames
+            Animation.Height           = Animation.Sheet:getHeight() / Animation.NumberSideFrames
+            Animation.ScaleX           = 1/(Animation.Width/Player.Width)
+            Animation.ScaleY           = 1/(Animation.Height/Player.Height)
+        return Animation
+        
+    end
+    Player.Animations      = {}
+        Player.Animations.Idle       = Player.NewAnimation ("resources/assets/Idle_Animation.png",16,4,16,"Idle")
+        Player.Animations.Run        = Player.NewAnimation ("resources/assets/Run_Animation.png",7,3,21,"Run")
+        Player.Animations.Jump       = Player.NewAnimation ("resources/assets/Jump_Animation.png",23,5,23,"Jump")            
+        Player.Animations.TurnAround = Player.NewAnimation ("resources/assets/TurnAround_Animation.png",1,1,1,"turnAround")
+
+    Player.CurrentAnimation = Player.Animations.Idle
+    Player.ScaleX          = Player.CurrentAnimation.ScaleX
+    Player.ScaleY          = Player.CurrentAnimation.ScaleY
+    Player.CurrentFrame    = 0
+    Player.XsideFrameCount = 0
+    Player.YsideFrameCount = 0
+    
+    function Player.AnimationsReset ()
+        Player.CurrentFrame = 0
+        Player.XsideFrameCount = 0
+        Player.YsideFrameCount = 0
+    end
+    function Player.Animate (dt)
+
+        if Player.SpeedX/math.abs(Player.SpeedX) == Player.SpeedX/math.abs(Player.SpeedX) then  --inverse le sprite quand le personnage se retourne
+            Player.ScaleX = Player.ScaleX * Player.SpeedX/math.abs(Player.SpeedX) * Player.ScaleX/math.abs(Player.ScaleX)
+        end
+       
+    
+        if math.abs(Player.SpeedX) > 2 and Player.CurrentAnimation ~= Player.Animations.Run and Player.Grounded then -- si la vitesse est superieur à un certain cap et que 
+            Player.CurrentAnimation = Player.Animations.Run                                                          -- le joueur est sur le sol alors animation course
+            Player.AnimationsReset()
+        end
+
+        if Player.SpeedX/math.abs(Player.SpeedX) * Player.AccelerationX < 0 and Player.CurrentAnimation ~= Player.Animations.TurnAroundand and Player.CurrentAnimation ~=Player.Animations.Idle  then -- si joueur freine alors TurnAround
+            Player.CurrentAnimation= Player.Animations.TurnAround
+            Player.AnimationsReset()
+        end
+
+        if math.abs(Player.SpeedX) < 2  and Player.CurrentAnimation ~= Player.Animations.Idle and Player.Grounded then -- si la vitesse est inferieur à un certain cap et que 
+            Player.CurrentAnimation = Player.Animations.Idle                                                           -- le joueur est sur le sol alors animation idle 
+            Player.AnimationsReset()
+        end
+
+        
+        
+        Player.Quad = love.graphics.newQuad(Player.XsideFrameCount*Player.CurrentAnimation.Width,Player.YsideFrameCount*Player.CurrentAnimation.Height,
+                Player.CurrentAnimation.Width,Player.CurrentAnimation.Height,Player.CurrentAnimation.Sheet:getWidth(),Player.CurrentAnimation.Sheet:getHeight())
+        Player.Time = Player.Time + dt
+    
+        if Player.Time >= 1/Player.CurrentAnimation.FPS then
+                
+            
+            Player.XsideFrameCount = Player.XsideFrameCount + 1
+    
+            if Player.XsideFrameCount >= Player.CurrentAnimation.NumberSideFrames then
+                Player.XsideFrameCount = 0
+                Player.YsideFrameCount = Player.YsideFrameCount + 1
+            end
+    
+            Player.CurrentFrame = Player.CurrentFrame + 1
+    
+            if Player.CurrentFrame >=Player.CurrentAnimation.TotalFrames then
+                Player.AnimationsReset()
+            end
+    
+            Player.Time = 0
+        end
+    end
+
+--########################################################################################################################################
+--                                            Interaction and Physics
+--########################################################################################################################################
     
     function Player.ApplyForce(forceX,forceY)
         Player.ForceX =Player.ForceX + forceX
@@ -81,9 +143,11 @@ function NewPlayer(x,y,color,right,left,jump)
         if love.keyboard.isDown(Player.Controls.Right)  then --droite
             if Player.Grounded then
                 Player.ApplyForce(Player.WalkForce,0)
+                
             else
                 Player.ApplyForce(Player.WalkForce/Player.AirControl,0)
             end
+            
         end
     
         if love.keyboard.isDown(Player.Controls.Left)  then--gauche
@@ -136,6 +200,10 @@ function NewPlayer(x,y,color,right,left,jump)
 
     end
 
+--########################################################################################################################################
+--                                            Collisions
+--########################################################################################################################################
+
     function Player.Collisions ()
         for i = Player.Xmap - 1 ,Player.Xmap + 1 do
             for j = Player.Ymap - 1, Player.Ymap + 1   do
@@ -167,42 +235,23 @@ function NewPlayer(x,y,color,right,left,jump)
         end
     end
 
-    function Player.Animate (dt)
-        Player.Time = Player.Time + dt
-        if Player.Time >= 1/Player.CurrentAnimation.FPS then
-            Player.Quad = love.graphics.newQuad(Player.XsideFrameCount*Player.CurrentAnimation.Width,Player.YsideFrameCount*Player.CurrentAnimation.Height,Player.CurrentAnimation.Width,
-            Player.CurrentAnimation.Height,Player.CurrentAnimation.Sheet:getWidth(),Player.CurrentAnimation.Sheet:getHeight())
-
-            Player.XsideFrameCount = Player.XsideFrameCount + 1
-
-            if Player.XsideFrameCount == Player.CurrentAnimation.NumberSideFrames then
-                Player.XsideFrameCount = 0
-                Player.YsideFrameCount = Player.YsideFrameCount + 1
-            end
-
-            Player.CurrentFrame = Player.CurrentFrame + 1
-
-            if Player.CurrentFrame==Player.CurrentAnimation.TotalFrames then
-                Player.CurrentFrame = 0
-                Player.XsideFrameCount = 0
-                Player.YsideFrameCount = 0
-            end
-            Player.Time = 0
-        end
-    end
+--########################################################################################################################################
+--                                           Execution
+--########################################################################################################################################
 
     function Player.update(dt)
-        Player.Physics(dt)      
+        Player.Physics(dt)
         Player.Collisions()
         Player.Animate(dt)
     end
     
     function Player.draw()
         love.graphics.setColor(Color.White)
-        love.graphics.draw(Player.CurrentAnimation.Sheet,Player.Quad,Player.X,Player.Y,Player.Angle,Player.ScaleX*5,Player.ScaleY*5,Player.Width/2,Player.Height/2)
-        --love.graphics.rectangle("fill",Player.X - Player.Width/2,Player.Y-Player.Height/2,Player.Width,Player.Height)
-       
+        
+        love.graphics.rectangle("fill",Player.X - Player.Width/2,Player.Y-Player.Height/2,Player.Width,Player.Height)
+        love.graphics.draw(Player.CurrentAnimation.Sheet,Player.Quad,Player.X,Player.Y,Player.Angle,Player.ScaleX*6,Player.ScaleY*6,Player.CurrentAnimation.Width/2,Player.CurrentAnimation.Height/2)
     end
     return Player
     
 end
+
