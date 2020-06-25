@@ -30,25 +30,27 @@ function NewPlayer(x,y,color,right,left,jump)
 --                                            Display and Animation
 --########################################################################################################################################
     
-    function Player.NewAnimation(imgsrc, nbFrames, nbSideFrames,fps,name)
+    function Player.NewAnimation(imgsrc, nbFrames, nbSideFramesX,nbSideFramesY,fps,name)
         local Animation = {}
             Animation.Sheet            = love.graphics.newImage(imgsrc)
             Animation.Name             = name
             Animation.TotalFrames      = nbFrames
-            Animation.NumberSideFrames = nbSideFrames
+            Animation.NumberSideFramesX= nbSideFramesX
+            Animation.NumberSideFramesY= nbSideFramesY
             Animation.FPS              = fps
-            Animation.Width            = Animation.Sheet:getWidth() / Animation.NumberSideFrames
-            Animation.Height           = Animation.Sheet:getHeight() / Animation.NumberSideFrames
+            Animation.Width            = Animation.Sheet:getWidth() / Animation.NumberSideFramesX
+            Animation.Height           = Animation.Sheet:getHeight() / Animation.NumberSideFramesY
             Animation.ScaleX           = 1/(Animation.Width/Player.Width)
             Animation.ScaleY           = 1/(Animation.Height/Player.Height)
         return Animation
         
     end
     Player.Animations      = {}
-        Player.Animations.Idle       = Player.NewAnimation ("resources/assets/Idle_Animation.png",16,4,16,"Idle")
-        Player.Animations.Run        = Player.NewAnimation ("resources/assets/Run_Animation.png",7,3,21,"Run")
-        Player.Animations.Jump       = Player.NewAnimation ("resources/assets/Jump_Animation.png",23,5,23,"Jump")            
-        Player.Animations.TurnAround = Player.NewAnimation ("resources/assets/TurnAround_Animation.png",1,1,1,"turnAround")
+        Player.Animations.Idle       = Player.NewAnimation ("resources/assets/Idle_Animation.png",16,4,4,16,"Idle")
+        Player.Animations.Run        = Player.NewAnimation ("resources/assets/Run_Animation.png",7,3,3,21,"Run")
+        Player.Animations.Jump       = Player.NewAnimation ("resources/assets/Jump_Animation.png",23,5,5,23,"Jump")            
+        Player.Animations.TurnAround = Player.NewAnimation ("resources/assets/TurnAround_Animation.png",1,1,1,1,"turnAround")
+        Player.Animations.HiddenIdle = Player.NewAnimation ("resources/assets/LongIdle.png",40,6,7,20,"HiddenIdle")
 
     Player.CurrentAnimation = Player.Animations.Idle
     Player.ScaleX          = Player.CurrentAnimation.ScaleX
@@ -56,34 +58,49 @@ function NewPlayer(x,y,color,right,left,jump)
     Player.CurrentFrame    = 0
     Player.XsideFrameCount = 0
     Player.YsideFrameCount = 0
-    
+    Player.HiddenIdleTimer = 0
+
     function Player.AnimationsReset ()
         Player.CurrentFrame = 0
         Player.XsideFrameCount = 0
         Player.YsideFrameCount = 0
     end
+
+    
+    
     function Player.Animate (dt)
 
         if Player.SpeedX/math.abs(Player.SpeedX) == Player.SpeedX/math.abs(Player.SpeedX) then  --inverse le sprite quand le personnage se retourne
             Player.ScaleX = Player.ScaleX * Player.SpeedX/math.abs(Player.SpeedX) * Player.ScaleX/math.abs(Player.ScaleX)
         end
        
-    
+    --Run
         if math.abs(Player.SpeedX) > 2 and Player.CurrentAnimation ~= Player.Animations.Run and Player.Grounded then -- si la vitesse est superieur à un certain cap et que 
             Player.CurrentAnimation = Player.Animations.Run                                                          -- le joueur est sur le sol alors animation course
             Player.AnimationsReset()
         end
-
-        if Player.SpeedX/math.abs(Player.SpeedX) * Player.AccelerationX < 0 and Player.CurrentAnimation ~= Player.Animations.TurnAroundand and Player.CurrentAnimation ~=Player.Animations.Idle  then -- si joueur freine alors TurnAround
-            Player.CurrentAnimation= Player.Animations.TurnAround
+--Turn around
+        if Player.SpeedX/math.abs(Player.SpeedX) * Player.AccelerationX < 0 and Player.CurrentAnimation ~= Player.Animations.TurnAroundand and Player.CurrentAnimation ~=Player.Animations.Idle and Player.CurrentAnimation ~= Player.Animations.HiddenIdle then -- si joueur freine alors TurnAround
+            Player.CurrentAnimation = Player.Animations.TurnAround
             Player.AnimationsReset()
         end
-
-        if math.abs(Player.SpeedX) < 2  and Player.CurrentAnimation ~= Player.Animations.Idle and Player.Grounded then -- si la vitesse est inferieur à un certain cap et que 
+-- Idle
+        if math.abs(Player.SpeedX) < 2  and Player.CurrentAnimation ~= Player.Animations.HiddenIdle and Player.CurrentAnimation ~= Player.Animations.Idle  and Player.Grounded then -- si la vitesse est inferieur à un certain cap et que 
             Player.CurrentAnimation = Player.Animations.Idle                                                           -- le joueur est sur le sol alors animation idle 
             Player.AnimationsReset()
         end
+--HiddenIdle
+        if Player.CurrentAnimation == Player.Animations.Idle  then
+            Player.HiddenIdleTimer = Player.HiddenIdleTimer + dt
+        else
+            Player.HiddenIdleTimer = 0
+        end
 
+        if Player.HiddenIdleTimer >= 17 then
+            Player.CurrentAnimation = Player.Animations.HiddenIdle
+            Player.AnimationsReset()
+            
+        end
         
         
         Player.Quad = love.graphics.newQuad(Player.XsideFrameCount*Player.CurrentAnimation.Width,Player.YsideFrameCount*Player.CurrentAnimation.Height,
@@ -95,19 +112,26 @@ function NewPlayer(x,y,color,right,left,jump)
             
             Player.XsideFrameCount = Player.XsideFrameCount + 1
     
-            if Player.XsideFrameCount >= Player.CurrentAnimation.NumberSideFrames then
+            if Player.XsideFrameCount >= Player.CurrentAnimation.NumberSideFramesX then
                 Player.XsideFrameCount = 0
                 Player.YsideFrameCount = Player.YsideFrameCount + 1
             end
     
             Player.CurrentFrame = Player.CurrentFrame + 1
     
-            if Player.CurrentFrame >=Player.CurrentAnimation.TotalFrames then
-                Player.AnimationsReset()
+            if Player.CurrentFrame ==Player.CurrentAnimation.TotalFrames then
+                if Player.CurrentAnimation ~= Player.Animations.HiddenIdle then
+                    Player.AnimationsReset()
+               else
+                   Player.CurrentFrame =Player.CurrentAnimation.TotalFrames-1
+                   Player.XsideFrameCount =3
+                   Player.YsideFrameCount = 6
+               end
             end
-    
+            
             Player.Time = 0
         end
+        
     end
 
 --########################################################################################################################################
@@ -197,6 +221,7 @@ function NewPlayer(x,y,color,right,left,jump)
     
         Player.ForceX = 0
         Player.ForceY = 0
+        
 
     end
 
@@ -243,13 +268,15 @@ function NewPlayer(x,y,color,right,left,jump)
         Player.Physics(dt)
         Player.Collisions()
         Player.Animate(dt)
+        
     end
     
     function Player.draw()
         love.graphics.setColor(Color.White)
         
-        love.graphics.rectangle("fill",Player.X - Player.Width/2,Player.Y-Player.Height/2,Player.Width,Player.Height)
+        --love.graphics.rectangle("fill",Player.X - Player.Width/2,Player.Y-Player.Height/2,Player.Width,Player.Height)
         love.graphics.draw(Player.CurrentAnimation.Sheet,Player.Quad,Player.X,Player.Y,Player.Angle,Player.ScaleX*6,Player.ScaleY*6,Player.CurrentAnimation.Width/2,Player.CurrentAnimation.Height/2)
+        
     end
     return Player
     

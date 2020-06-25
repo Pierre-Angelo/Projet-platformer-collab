@@ -13,6 +13,7 @@ love.window.setMode(Xecran,Yecran,{fullscreen})
 G = 1500
 AirFriction = 1.1
 
+
 require("color")
 require("grid")
 require("platform")
@@ -21,7 +22,7 @@ require("player")
 
 Map = NewMap(50,50,50)
 
-Player1 = NewPlayer(Xecran/6,Yecran/10,Color.LightRed,'d','q','space')
+Player1 = NewPlayer(Xecran/6,Yecran/10,Color.Pink,'d','q','space')
 
 Ground  = NewPlatform(0,18,30,5,1,5)
 LeftWall = NewPlatform(38,0,1,25,2,5)
@@ -55,7 +56,7 @@ function love.draw()
     Player1.draw()
     Map.draw()
     love.graphics.setColor(Color.Red)
-    love.graphics.print(Player1.CurrentAnimation.Name)
+    love.graphics.print(Player1.CurrentFrame..";"..Player1.XsideFrameCount..";"..Player1.YsideFrameCount)
 end
 
 function love.keypressed(key)
