@@ -19,3 +19,5 @@ Color ={}
     Color.LightOrange  = {0.9,0.6,0.2}
     Color.Ochre        = {0.9,0.6,0.1}
     Color.DarkBlue     = {0.05,0.05,0.7}
+    Color.DarkPurple   = {0.5,0,0.5}
+    Color.DarkGreen    = {0,0.5,0}

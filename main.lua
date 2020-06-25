@@ -49,14 +49,14 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.setBackgroundColor(Color.DarkBlue)
+    love.graphics.setBackgroundColor(Color.LightOrange)
     for i, platfrom in ipairs(Plaforms) do
         platfrom.draw()
     end
     Player1.draw()
     Map.draw()
     love.graphics.setColor(Color.Red)
-    love.graphics.print(Player1.CurrentFrame..";"..Player1.XsideFrameCount..";"..Player1.YsideFrameCount)
+    love.graphics.print(Player1.CurrentAnimation.Height)
 end
 
 function love.keypressed(key)
