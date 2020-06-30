@@ -12,7 +12,7 @@ love.window.setMode(Xecran,Yecran,{fullscreen})
 
 G = 1500
 AirFriction = 1.1
-
+GroundFriction = 5
 
 require("color")
 require("grid")
@@ -24,14 +24,14 @@ Map = NewMap(50,50,50)
 
 Player1 = NewPlayer(Xecran/6,Yecran/10,Color.Pink,'d','q','space')
 
-Ground  = NewPlatform(0,18,30,5,1,5)
-LeftWall = NewPlatform(38,0,1,25,2,5)
-RightWall =  NewPlatform(0,0,1,25,3,5)
-Ceiling  = NewPlatform(0,0,40,1,4,5)
-Obs      = NewPlatform(10,14,13,3,5,5)
-Float    = NewPlatform(20,10,10,2,6,5)
-Hole =  NewPlatform(30,21,10,2,7,5)
-Plushaut = NewPlatform(8,6,8,1,8,5)
+Ground    = NewPlatform(0,18,30,5,1,GroundFriction)
+LeftWall  = NewPlatform(38,0,1,25,2,GroundFriction)
+RightWall =  NewPlatform(0,0,1,25,3,GroundFriction)
+Ceiling   = NewPlatform(0,0,40,1,4,GroundFriction)
+Obs       = NewPlatform(10,14,13,4,5,GroundFriction)
+Float     = NewPlatform(20,10,10,2,6,GroundFriction)
+Hole      =  NewPlatform(30,21,10,2,7,GroundFriction)
+Plushaut  = NewPlatform(8,6,8,1,8,GroundFriction)
 
 
 Plaforms = {Ground,LeftWall,RightWall,Ceiling,Obs,Float,Hole,Plushaut} 
@@ -55,8 +55,8 @@ function love.draw()
     end
     Player1.draw()
     Map.draw()
-    love.graphics.setColor(Color.Red)
-    love.graphics.print(Player1.CurrentAnimation.Height)
+    love.graphics.setColor(Color.Blue)
+    love.graphics.print(Player1.SpeedX)
 end
 
 function love.keypressed(key)

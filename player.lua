@@ -14,8 +14,8 @@ function NewPlayer(x,y,color,right,left,jump)
     Player.WalkForce       = 4000 -- force appliquée quant le joueur avance
     Player.JumpForce       = 50000 -- force appliquée quant le joueur saute
     Player.AirControl      = 4   --diviseur de la force horizontale appliquée lorsque le joueur est dans les airs
-    Player.Width           = 100
-    Player.Height          = 100
+    Player.Width           = 40
+    Player.Height          = 101
     Player.Angle           = 0
     Player.Grounded        = false
     Player.Time            = 0
@@ -53,7 +53,7 @@ function NewPlayer(x,y,color,right,left,jump)
         Player.Animations.HiddenIdle = Player.NewAnimation ("resources/assets/LongIdle.png",40,6,7,17,"HiddenIdle")
 
     Player.CurrentAnimation = Player.Animations.Idle
-    Player.ScaleX          = Player.CurrentAnimation.ScaleX
+    Player.ScaleX          = Player.CurrentAnimation.ScaleX *2.5
     Player.ScaleY          = Player.CurrentAnimation.ScaleY
     Player.CurrentFrame    = 0
     Player.XsideFrameCount = 0
@@ -75,7 +75,7 @@ function NewPlayer(x,y,color,right,left,jump)
         end
        
     --Run
-        if math.abs(Player.SpeedX) > 4.5 and Player.CurrentAnimation ~= Player.Animations.Run and Player.Grounded then -- si la vitesse est superieur à un certain cap et que 
+        if math.abs(Player.SpeedX) > 5 and Player.CurrentAnimation ~= Player.Animations.Run and Player.Grounded then -- si la vitesse est superieur à un certain cap et que 
             Player.CurrentAnimation = Player.Animations.Run                                                          -- le joueur est sur le sol alors animation course
             Player.AnimationsReset()
         end
@@ -85,7 +85,7 @@ function NewPlayer(x,y,color,right,left,jump)
             Player.AnimationsReset()
         end
 -- Idle
-        if math.abs(Player.SpeedX) < 4.5  and Player.CurrentAnimation ~= Player.Animations.HiddenIdle and Player.CurrentAnimation ~= Player.Animations.Idle  and Player.Grounded then -- si la vitesse est inferieur à un certain cap et que 
+        if math.abs(Player.SpeedX) < 5  and Player.CurrentAnimation ~= Player.Animations.HiddenIdle and Player.CurrentAnimation ~= Player.Animations.Idle  and Player.Grounded then -- si la vitesse est inferieur à un certain cap et que 
             Player.CurrentAnimation = Player.Animations.Idle                                                           -- le joueur est sur le sol alors animation idle 
             Player.AnimationsReset()
         end
@@ -265,17 +265,15 @@ function NewPlayer(x,y,color,right,left,jump)
 --########################################################################################################################################
 
     function Player.update(dt)
-        Player.Physics(dt)
-        Player.Collisions()
         Player.Animate(dt)
-        
+        Player.Physics(dt)
+        Player.Collisions()       
     end
     
     function Player.draw()
         love.graphics.setColor(Color.White)
         
         --love.graphics.rectangle("fill",Player.X - Player.Width/2,Player.Y-Player.Height/2,Player.Width,Player.Height)
-        --love.graphics.draw(Player.CurrentAnimation.Sheet,Player.Quad,Player.X,Player.Y,Player.Angle,Player.ScaleX,Player.ScaleY,Player.CurrentAnimation.Width/2,Player.CurrentAnimation.Height/2)
         love.graphics.draw(Player.CurrentAnimation.Sheet,Player.Quad,Player.X,Player.Y+3,Player.Angle,Player.ScaleX*2.3,Player.ScaleY*2.3,Player.CurrentAnimation.Width/2,Player.CurrentAnimation.Height/2)
     end
     return Player
