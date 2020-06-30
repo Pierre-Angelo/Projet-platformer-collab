@@ -14,8 +14,8 @@ function NewPlayer(x,y,color,right,left,jump)
     Player.WalkForce       = 4000 -- force appliquée quant le joueur avance
     Player.JumpForce       = 50000 -- force appliquée quant le joueur saute
     Player.AirControl      = 4   --diviseur de la force horizontale appliquée lorsque le joueur est dans les airs
-    Player.Width           = 40
-    Player.Height          = 101
+    Player.Width           = 20
+    Player.Height          = 50
     Player.Angle           = 0
     Player.Grounded        = false
     Player.Time            = 0

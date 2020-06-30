@@ -11,8 +11,8 @@ Xecran,Yecran      =  love.window.getDesktopDimensions()
 love.window.setMode(Xecran,Yecran,{fullscreen})
 
 G = 1500
-AirFriction = 1.1
-GroundFriction = 5
+AirFriction = 2
+GroundFriction = 6
 
 require("color")
 require("grid")
@@ -56,7 +56,6 @@ function love.draw()
     Player1.draw()
     Map.draw()
     love.graphics.setColor(Color.Blue)
-    love.graphics.print(Player1.SpeedX)
 end
 
 function love.keypressed(key)
