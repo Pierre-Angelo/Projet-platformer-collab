@@ -1,11 +1,12 @@
-function NewPlatform (x,y,width,height,id,frictionValue)
+function NewPlatform (x,y,width,height,frictionValue)
+CptPlatform = CptPlatform + 1
 
 local Platform = {}
 Platform.Xmap      = x
 Platform.Ymap      = y
 Platform.WidthMap  = width
 Platform.HeightMap = height
-Platform.ID        = id
+Platform.ID        = CptPlatform
 Platform.Friction  = frictionValue
   
 
@@ -15,7 +16,7 @@ function Platform.update()
     for i = Platform.Xmap , Platform.Xmap + Platform.WidthMap -1 do
         for j =Platform.Ymap ,Platform.Ymap +Platform.HeightMap -1 do
             Map[i][j].Occupied = true
-            Map[i][j].Platform = id
+            Map[i][j].Platform = Platform.ID
         end
     end
 
