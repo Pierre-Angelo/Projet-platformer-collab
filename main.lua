@@ -46,7 +46,7 @@ end
 
 function love.update(dt)
     Player1.update(dt)
-    for i, platfrom in ipairs(Plaforms) do
+    for _, platfrom in pairs(Plaforms) do
         platfrom.update()
     end
 
@@ -54,13 +54,13 @@ end
 
 function love.draw()
     love.graphics.setBackgroundColor(Color.LightOrange)
-    for i, platfrom in ipairs(Plaforms) do
+    for _, platfrom in pairs(Plaforms) do
         platfrom.draw()
     end
     Player1.draw()
     Map.draw()
-    love.graphics.setColor(Color.Blue)
-    love.graphics.print(Player1.DoubleJumpCount)
+    --[[ love.graphics.setColor(Color.Blue)
+    love.graphics.print(Player1.AccelerationX) ]]
 end
 
 function love.keypressed(key)
