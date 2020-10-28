@@ -63,10 +63,5 @@ function love.draw()
     love.graphics.print(Player1.AccelerationX) ]]
 end
 
-function love.keypressed(key)
-    if key=="escape" then
-        love.event.quit()
-    end
-    Player1.keypressed(key)
-end
+
 
